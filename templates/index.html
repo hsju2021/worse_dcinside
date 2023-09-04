@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>My BBS</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+    <header>
+        <h1>Welcome to My BBS</h1>
+    </header>
+    <main>
+        <section>
+            <h2>Posts</h2>
+            <ul>
+                {% for post in posts %}
+                    <li>
+                        <h3>{{ post.title }}</h3>
+                        <p>{{ post.content }}</p>
+                    </li>
+                {% endfor %}
+            </ul>
+        </section>
+        <section>
+            <a href="{{ url_for('posts') }}">Create a New Post</a>
+        </section>
+    </main>
+    <footer>
+        <p>My BBS &copy; 2023</p>
+    </footer>
+</body>
+</html>

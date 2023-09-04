@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Create a New Post</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+    <header>
+        <h1>Create a New Post</h1>
+    </header>
+    <main>
+        <form action="{{ url_for('posts') }}" method="post">
+            {{ form.hidden_tag() }}
+            <div>
+                <label for="title">Title:</label>
+                {{ form.title(id='title') }}
+            </div>
+            <div>
+                <label for="content">Content:</label>
+                {{ form.content(id='content') }}
+            </div>
+            <div>
+                {{ form.submit() }}
+            </div>
+        </form>
+    </main>
+    <footer>
+        <p>My BBS &copy; 2023</p>
+    </footer>
+</body>
+</html>
