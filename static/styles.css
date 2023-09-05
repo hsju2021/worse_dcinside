@@ -71,3 +71,16 @@ a {
 a:hover {
     background-color: #449c89;
 }
+
+button {
+    display: inline-block;
+    background-color: #de5252;
+    color: white;
+    border-radius: 4px;
+    text-decoration: none;
+    border: none;
+}
+
+button:hover {
+    background-color: #cf2222;
+}

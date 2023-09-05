@@ -40,5 +40,13 @@ def posts():
         return redirect(url_for('index'))
     return render_template('post.html', form=form)
 
+@app.route('/delete_post/<int:post_id>', methods=['POST'])
+def delete_post(post_id):
+    post = Post.query.get_or_404(post_id)
+    db.session.delete(post)
+    db.session.commit()
+    flash('Post has been deleted!', 'success')
+    return redirect(url_for('index'))
+
 if __name__ == '__main__':
     app.run(debug=True)
