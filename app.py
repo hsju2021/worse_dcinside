@@ -2,6 +2,8 @@ from flask import Flask, render_template, redirect, url_for, flash
 from flask_sqlalchemy import SQLAlchemy
 from flask_wtf import FlaskForm
 from wtforms import StringField, TextAreaField, SubmitField
+from flask_migrate import Migrate
+from wtforms.validators import DataRequired
 
 app = Flask(__name__)
 
@@ -17,12 +19,16 @@ class Post(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String(100), nullable=False)
     content = db.Column(db.Text, nullable=False)
+    username = db.Column(db.String(20), nullable=False, default='Anonymous')
 
 # Form for creating/editing posts
 class PostForm(FlaskForm):
     title = StringField('Title')
     content = TextAreaField('Content')
     submit = SubmitField('Post')
+    username = StringField('Username', validators=[DataRequired()])
+
+migrate = Migrate(app, db)
 
 @app.route('/')
 def index():
@@ -33,7 +39,7 @@ def index():
 def posts():
     form = PostForm()
     if form.validate_on_submit():
-        post = Post(title=form.title.data, content=form.content.data)
+        post = Post(title=form.title.data, content=form.content.data, username=form.username.data)
         db.session.add(post)
         db.session.commit()
         flash('Post created successfully!', 'success')

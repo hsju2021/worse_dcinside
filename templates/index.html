@@ -2,12 +2,12 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>My BBS</title>
+    <title>better_dcinside</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
 </head>
 <body>
     <header>
-        <h1>Welcome to My BBS</h1>
+        <h1>Home Page</h1>
     </header>
     <main>
         <section>
@@ -18,7 +18,7 @@
                         <form action="{{ url_for('delete_post', post_id=post.id) }}" method="post">
                             <button type="submit">Delete</button>
                         </form>
-                        <h3>{{ post.title }}</h3>
+                        <h3>{{ post.title }} <small>by {{ post.username }}</small> </h3> 
                         <p>{{ post.content }}</p>
                     </li>
                 {% endfor %}
