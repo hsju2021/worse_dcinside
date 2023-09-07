@@ -1,3 +1,4 @@
+from datetime import datetime
 from flask import Flask, render_template, redirect, url_for, flash
 from flask_sqlalchemy import SQLAlchemy
 from flask_wtf import FlaskForm
@@ -17,9 +18,11 @@ db = SQLAlchemy(app)
 # Database model for posts
 class Post(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    title = db.Column(db.String(100), nullable=False)
-    content = db.Column(db.Text, nullable=False)
-    username = db.Column(db.String(20), nullable=False, default='Anonymous')
+    title = db.Column(db.String(100), nullable=True)
+    content = db.Column(db.Text, nullable=True)
+    username = db.Column(db.String(20), nullable=True, default='Anonymous')
+    comments = db.relationship('Comment', backref='post', lazy=True, cascade="all, delete-orphan")
+    date_posted = db.Column(db.DateTime, nullable=True, default=datetime.utcnow)
 
 # Form for creating/editing posts
 class PostForm(FlaskForm):
@@ -28,12 +31,24 @@ class PostForm(FlaskForm):
     submit = SubmitField('Post')
     username = StringField('Username', validators=[DataRequired()])
 
+class Comment(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    content = db.Column(db.Text, nullable=True)
+    username = db.Column(db.String(100), nullable=True)
+    post_id = db.Column(db.Integer, db.ForeignKey('post.id'), nullable=True)
+
+class CommentForm(FlaskForm):
+    username = StringField('Username', validators=[DataRequired()])
+    content = TextAreaField('Comment', validators=[DataRequired()])
+    submit = SubmitField('Post Comment')
+
 migrate = Migrate(app, db)
 
 @app.route('/')
 def index():
-    posts = Post.query.all()  # Fetch all posts from the database
-    return render_template('index.html', posts=posts)
+    posts = Post.query.order_by(Post.date_posted.desc()).all()  # Fetch all posts from the database
+    comment_form = CommentForm()
+    return render_template('index.html', posts=posts, comment_form=comment_form)
 
 @app.route('/posts', methods=['GET', 'POST'])
 def posts():
@@ -53,6 +68,25 @@ def delete_post(post_id):
     db.session.commit()
     flash('Post has been deleted!', 'success')
     return redirect(url_for('index'))
+
+@app.route('/add_comment/<int:post_id>', methods=['POST'])
+def add_comment(post_id):
+    form = CommentForm()
+    if form.validate_on_submit():
+        comment = Comment(content=form.content.data, username=form.username.data, post_id=post_id)
+        db.session.add(comment)
+        db.session.commit()
+        flash('Comment added!', 'success')
+    return redirect(url_for('index'))
+
+@app.route('/delete_comment/<int:comment_id>', methods=['POST'])
+def delete_comment(comment_id):
+    comment = Comment.query.get_or_404(comment_id)
+    db.session.delete(comment)
+    db.session.commit()
+    flash('Comment has been deleted!', 'success')
+    return redirect(url_for('index'))
+
 
 if __name__ == '__main__':
     app.run(debug=True)
